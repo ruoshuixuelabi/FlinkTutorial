@@ -2,6 +2,11 @@ package com.atguigu.wc;
 
 import cn.hutool.core.io.resource.ClassPathResource;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.connector.file.src.FileSource;
+import org.apache.flink.connector.file.src.FileSourceSplit;
+import org.apache.flink.connector.file.src.reader.TextLineInputFormat;
+import org.apache.flink.core.fs.Path;
+import org.apache.flink.core.io.SimpleVersionedSerializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -11,7 +16,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  * @Author: wushengran on 2020/11/6 11:48
  * @Version: 1.0
  */
-public class StreamWordCount {
+public class NewStreamWordCount {
     public static void main(String[] args) throws Exception {
         // 创建流处理执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -21,7 +26,8 @@ public class StreamWordCount {
         ClassPathResource classPathResource = new ClassPathResource("hello.txt");
 //        String inputPath = "D:\\Projects\\BigData\\FlinkTutorial\\src\\main\\resources\\hello.txt";
         String inputPath = classPathResource.getAbsolutePath();
-        DataStream<String> inputDataStream = env.readTextFile(inputPath);
+//        FileSource<String> inputDataStream = FileSource.forRecordStreamFormat(new TextLineInputFormat(), new Path(inputPath)).build();
+                DataStream<String> inputDataStream = env.readTextFile(inputPath);
         // 用parameter tool工具从程序启动参数中提取配置项
 //        ParameterTool parameterTool = ParameterTool.fromArgs(args);
 //        String host = parameterTool.get("host");
@@ -34,7 +40,8 @@ public class StreamWordCount {
                 .sum(1)
                 .setParallelism(2);
         resultStream.print().setParallelism(1);
-        // 执行任务
+//        // 执行任务
+        System.out.println(inputDataStream);
         env.execute();
     }
 }
