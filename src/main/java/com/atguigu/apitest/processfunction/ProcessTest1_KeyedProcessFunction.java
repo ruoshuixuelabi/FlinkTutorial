@@ -1,12 +1,4 @@
-package com.atguigu.apitest.processfunction;/**
- * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved
- * <p>
- * Project: FlinkTutorial
- * Package: com.atguigu.apitest.processfunction
- * Version: 1.0
- * <p>
- * Created by wushengran on 2020/11/11 10:25
- */
+package com.atguigu.apitest.processfunction;
 
 import com.atguigu.apitest.beans.SensorReading;
 import org.apache.flink.api.common.state.ValueState;
@@ -25,7 +17,7 @@ import org.apache.flink.util.Collector;
  * @Version: 1.0
  */
 public class ProcessTest1_KeyedProcessFunction {
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
@@ -40,19 +32,19 @@ public class ProcessTest1_KeyedProcessFunction {
 
         // 测试KeyedProcessFunction，先分组然后自定义处理
         dataStream.keyBy("id")
-                .process( new MyProcess() )
+                .process(new MyProcess())
                 .print();
 
         env.execute();
     }
 
     // 实现自定义的处理函数
-    public static class MyProcess extends KeyedProcessFunction<Tuple, SensorReading, Integer>{
+    public static class MyProcess extends KeyedProcessFunction<Tuple, SensorReading, Integer> {
         ValueState<Long> tsTimerState;
 
         @Override
         public void open(Configuration parameters) throws Exception {
-            tsTimerState =  getRuntimeContext().getState(new ValueStateDescriptor<Long>("ts-timer", Long.class));
+            tsTimerState = getRuntimeContext().getState(new ValueStateDescriptor<Long>("ts-timer", Long.class));
         }
 
         @Override
@@ -65,7 +57,7 @@ public class ProcessTest1_KeyedProcessFunction {
 //            ctx.output();
             ctx.timerService().currentProcessingTime();
             ctx.timerService().currentWatermark();
-            ctx.timerService().registerProcessingTimeTimer( ctx.timerService().currentProcessingTime() + 5000L);
+            ctx.timerService().registerProcessingTimeTimer(ctx.timerService().currentProcessingTime() + 5000L);
             tsTimerState.update(ctx.timerService().currentProcessingTime() + 1000L);
 //            ctx.timerService().registerEventTimeTimer((value.getTimestamp() + 10) * 1000L);
 //            ctx.timerService().deleteProcessingTimeTimer(tsTimerState.value());

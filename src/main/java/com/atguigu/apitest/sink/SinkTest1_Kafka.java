@@ -3,6 +3,7 @@ package com.atguigu.apitest.sink;
 import com.atguigu.apitest.beans.SensorReading;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.connector.sink.Sink;
 import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
@@ -56,7 +57,7 @@ public class SinkTest1_Kafka {
                 )
                 .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                 .build();
-        dataStream.sinkTo(sink);
+        dataStream.sinkTo((Sink<String, ?, ?, ?>) sink);
         env.execute();
     }
 }
