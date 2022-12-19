@@ -1,10 +1,10 @@
 package com.atguigu.apitest.tableapi;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.apache.flink.table.descriptors.Schema;
+
+import static org.apache.flink.table.api.Expressions.$;
 
 /**
  * @ClassName: TableTest3_FileOutput
@@ -20,44 +20,43 @@ public class TableTest3_FileOutput {
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
         // 2. 表的创建：连接外部系统，读取数据
         // 读取文件
-        String filePath = "D:\\Projects\\BigData\\FlinkTutorial\\src\\main\\resources\\sensor.txt";
-        tableEnv.connect( new FileSystem().path(filePath))
-                .withFormat( new Csv())
-                .withSchema( new Schema()
-                        .field("id", DataTypes.STRING())
-                        .field("timestamp", DataTypes.BIGINT())
-                        .field("temp", DataTypes.DOUBLE())
-                )
-                .createTemporaryTable("inputTable");
-
+        String fileTable = "CREATE TABLE inputTable (\n" +
+                "  id STRING,\n" +
+                "  `timestamp` BIGINT,\n" +
+                "  temp DOUBLE\n" +
+                ") WITH (\n" +
+                "  'connector' = 'filesystem'," +
+                "  'path' = 'file:///E:\\mazhenkun\\FlinkTutorial\\src\\main\\resources\\hello2.txt', " +
+                "  'format' = 'csv'" +
+                ")";
+        tableEnv.executeSql(fileTable);
         Table inputTable = tableEnv.from("inputTable");
-//        inputTable.printSchema();
-//        tableEnv.toAppendStream(inputTable, Row.class).print();
-
         // 3. 查询转换
         // 3.1 Table API
-        // 简单转换
-        Table resultTable = inputTable.select("id, temp").filter("id === 'sensor_6'");
-        // 聚合统计
-        Table aggTable = inputTable.groupBy("id").select("id, id.count as count, temp.avg as avgTemp");
+        Table resultTable = inputTable.select($("id"), $("temp")).filter($("id").isEqual("hello4"));
         // 3.2 SQL
-        tableEnv.sqlQuery("select id, temp from inputTable where id = 'senosr_6'");
-        Table sqlAggTable = tableEnv.sqlQuery("select id, count(id) as cnt, avg(temp) as avgTemp from inputTable group by id");
+        Table table = tableEnv.sqlQuery("select id, temp from inputTable where id = 'hello4'");
         // 4. 输出到文件
         // 连接外部文件注册输出表
-        String outputPath = "D:\\Projects\\BigData\\FlinkTutorial\\src\\main\\resources\\out.txt";
-        tableEnv.connect( new FileSystem().path(outputPath))
-                .withFormat( new Csv())
-                .withSchema( new Schema()
-                        .field("id", DataTypes.STRING())
-//                        .field("cnt", DataTypes.BIGINT())
-                        .field("temperature", DataTypes.DOUBLE())
-                )
-                .createTemporaryTable("outputTable");
-
-        resultTable.insertInto("outputTable");
+        String fileTable2 = "CREATE TABLE outputTable (\n" +
+                "  id STRING,\n" +
+                "  temp DOUBLE\n" +
+                ") WITH (\n" +
+                "  'connector' = 'filesystem'," +
+                "  'path' = 'file:///E:\\mazhenkun\\FlinkTutorial\\src\\main\\resources\\hello3.txt', " +
+                "  'format' = 'csv'" +
+                ")";
+        tableEnv.executeSql(fileTable2);
+        resultTable.executeInsert("outputTable");
+        String fileTable3 = "CREATE TABLE printoutputTable (\n" +
+                "  id STRING,\n" +
+                "  temp DOUBLE\n" +
+                ") WITH (\n" +
+                "  'connector' = 'print'" +
+                ")";
+        tableEnv.executeSql(fileTable3);
+        table.executeInsert("printoutputTable");
 //        aggTable.insertInto("outputTable");
-
-        env.execute();
+//        env.execute();
     }
 }

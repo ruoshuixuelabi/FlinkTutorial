@@ -1,6 +1,8 @@
 package com.atguigu.wc;
 
 import cn.hutool.core.io.resource.ClassPathResource;
+import com.qianlima.yanjiuyuan.dataprocess.NoticeInfoData;
+import com.qianlima.yanjiuyuan.dataprocess.PropertyUtils;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -17,6 +19,7 @@ import org.apache.flink.util.Collector;
 // 批处理word count
 public class WordCount {
     public static void main(String[] args) throws Exception {
+        PropertyUtils.extractProperty(new NoticeInfoData());
         // 创建执行环境
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         ClassPathResource classPathResource = new ClassPathResource("hello.txt");

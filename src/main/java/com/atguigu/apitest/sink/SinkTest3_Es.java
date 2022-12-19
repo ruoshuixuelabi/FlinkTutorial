@@ -31,14 +31,12 @@ public class SinkTest3_Es {
             String[] fields = line.split(",");
             return new SensorReading(fields[0], Long.valueOf(fields[1]), new Double(fields[2]));
         });
-
-        dataStream.sinkTo(
-                (Sink<SensorReading, ?, ?, ?>) new Elasticsearch7SinkBuilder<SensorReading>()
-                        // 下面的设置使 sink 在接收每个元素之后立即提交，否则这些元素将被缓存起来
-                        .setBulkFlushMaxActions(1)
-                        .setHosts(new HttpHost("127.0.0.1", 9200, "http"))
-                        .setEmitter((element, context, indexer) -> indexer.add(createIndexRequest(element)))
-                        .build());
+        dataStream.sinkTo(new Elasticsearch7SinkBuilder<SensorReading>()
+                // 下面的设置使 sink 在接收每个元素之后立即提交，否则这些元素将被缓存起来
+                .setBulkFlushMaxActions(1)
+                .setHosts(new HttpHost("127.0.0.1", 9200, "http"))
+                .setEmitter((element, context, indexer) -> indexer.add(createIndexRequest(element)))
+                .build());
 //        // 定义es的连接配置  旧版本如下使用
 //        ArrayList<HttpHost> httpHosts = new ArrayList<>();
 //        httpHosts.add(new HttpHost("localhost", 9200));
