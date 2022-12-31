@@ -2,11 +2,6 @@ package com.atguigu.wc;
 
 import cn.hutool.core.io.resource.ClassPathResource;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.connector.file.src.FileSource;
-import org.apache.flink.connector.file.src.FileSourceSplit;
-import org.apache.flink.connector.file.src.reader.TextLineInputFormat;
-import org.apache.flink.core.fs.Path;
-import org.apache.flink.core.io.SimpleVersionedSerializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -27,13 +22,13 @@ public class NewStreamWordCount {
 //        String inputPath = "D:\\Projects\\BigData\\FlinkTutorial\\src\\main\\resources\\hello.txt";
         String inputPath = classPathResource.getAbsolutePath();
 //        FileSource<String> inputDataStream = FileSource.forRecordStreamFormat(new TextLineInputFormat(), new Path(inputPath)).build();
-                DataStream<String> inputDataStream = env.readTextFile(inputPath);
+//                DataStream<String> inputDataStream = env.readTextFile(inputPath);
         // 用parameter tool工具从程序启动参数中提取配置项
 //        ParameterTool parameterTool = ParameterTool.fromArgs(args);
 //        String host = parameterTool.get("host");
 //        int port = parameterTool.getInt("port");
         // 从socket文本流读取数据
-//        DataStream<String> inputDataStream = env.socketTextStream(host, port);
+        DataStream<String> inputDataStream = env.socketTextStream("hadoop2", 7777);
         // 基于数据流进行转换计算
         DataStream<Tuple2<String, Integer>> resultStream = inputDataStream.flatMap(new WordCount.MyFlatMapper())
                 .keyBy(0)

@@ -9,7 +9,7 @@
     <properties>
         <flink-version>1.16.0</flink-version>
         <flink-connector-mysql-cdc-version>2.3.0</flink-connector-mysql-cdc-version>
-        <hutool-version>5.8.10</hutool-version>
+        <hutool-version>5.8.11</hutool-version>
     </properties>
     <dependencies>
         <dependency>
