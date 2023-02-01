@@ -25,29 +25,24 @@ import java.util.List;
  * @Version: 1.0
  */
 public class StateTest1_OperatorState {
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         // socket文本流
         DataStream<String> inputStream = env.socketTextStream("localhost", 7777);
-
         // 转换成SensorReading类型
         DataStream<SensorReading> dataStream = inputStream.map(line -> {
             String[] fields = line.split(",");
             return new SensorReading(fields[0], new Long(fields[1]), new Double(fields[2]));
         });
-
         // 定义一个有状态的map操作，统计当前分区数据个数
         SingleOutputStreamOperator<Integer> resultStream = dataStream.map(new MyCountMapper());
-
         resultStream.print();
-
         env.execute();
     }
 
     // 自定义MapFunction
-    public static class MyCountMapper implements MapFunction<SensorReading, Integer>, ListCheckpointed<Integer>{
+    public static class MyCountMapper implements MapFunction<SensorReading, Integer>, ListCheckpointed<Integer> {
         // 定义一个本地变量，作为算子状态
         private Integer count = 0;
 
@@ -64,7 +59,7 @@ public class StateTest1_OperatorState {
 
         @Override
         public void restoreState(List<Integer> state) throws Exception {
-            for( Integer num: state )
+            for (Integer num : state)
                 count += num;
         }
     }

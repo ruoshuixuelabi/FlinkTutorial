@@ -32,10 +32,8 @@ public class WindowTest3_EventTimeWindow {
 //        env.setParallelism(1);
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
         env.getConfig().setAutoWatermarkInterval(100);
-
         // socket文本流
         DataStream<String> inputStream = env.socketTextStream("localhost", 7777);
-
         // 转换成SensorReading类型，分配时间戳和watermark
         DataStream<SensorReading> dataStream = inputStream.map(line -> {
                     String[] fields = line.split(",");
@@ -53,7 +51,7 @@ public class WindowTest3_EventTimeWindow {
                         .withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
                             @Override
                             public long extractTimestamp(SensorReading element, long recordTimestamp) {
-                                return element.getTimestamp()* 1000L;
+                                return element.getTimestamp() * 1000L;
                             }
                         })
                 );
@@ -63,7 +61,6 @@ public class WindowTest3_EventTimeWindow {
 //                        return element.getTimestamp() * 1000L;
 //                    }
 //                });
-
         OutputTag<SensorReading> outputTag = new OutputTag<SensorReading>("late") {
         };
         // 基于事件时间的开窗聚合，统计15秒内温度的最小值
