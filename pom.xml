@@ -10,6 +10,7 @@
         <flink-version>1.16.0</flink-version>
         <flink-connector-mysql-cdc-version>2.3.0</flink-connector-mysql-cdc-version>
         <hutool-version>5.8.11</hutool-version>
+        <hbase-version>2.5.3</hbase-version>
     </properties>
     <dependencies>
         <dependency>
@@ -48,6 +49,11 @@
             <version>${flink-version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+            <version>${hbase-version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-files</artifactId>
             <version>${flink-version}</version>
@@ -82,6 +88,21 @@
                     <groupId>org.apache.flink</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.19.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.19.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.24</version>
         </dependency>
     </dependencies>
     <build>

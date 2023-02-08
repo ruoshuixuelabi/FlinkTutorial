@@ -1,23 +1,12 @@
 package com.atguigu.chapter05;
-
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-
 public class TransReduceTest {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         // 这里的使用了之前自定义数据源小节中的ClickSource()
         env.addSource(new ClickSource())
                 // 将Event数据类型转换成元组类型
@@ -44,9 +33,6 @@ public class TransReduceTest {
                     }
                 })
                 .print();
-
         env.execute();
-
     }
 }
-

@@ -1,13 +1,5 @@
 package com.atguigu.chapter06;
 
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import com.atguigu.chapter05.ClickSource;
 import com.atguigu.chapter05.Event;
 import org.apache.flink.api.common.eventtime.*;
@@ -18,12 +10,10 @@ public class CustomWatermarkTest {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         env
                 .addSource(new ClickSource())
                 .assignTimestampsAndWatermarks(new CustomWatermarkStrategy())
                 .print();
-
         env.execute();
     }
 
@@ -61,4 +51,3 @@ public class CustomWatermarkTest {
         }
     }
 }
-

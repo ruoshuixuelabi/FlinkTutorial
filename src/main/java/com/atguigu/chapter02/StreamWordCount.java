@@ -1,13 +1,5 @@
 package com.atguigu.chapter02;
 
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -44,4 +36,3 @@ public class StreamWordCount {
         env.execute();
     }
 }
-
