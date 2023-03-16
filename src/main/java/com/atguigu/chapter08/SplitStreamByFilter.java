@@ -1,20 +1,10 @@
 package com.atguigu.chapter08;
-
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import com.atguigu.chapter05.ClickSource;
 import com.atguigu.chapter05.Event;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-
 public class SplitStreamByFilter {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -42,15 +32,9 @@ public class SplitStreamByFilter {
                 return !value.user.equals("Mary") && !value.user.equals("Bob") ;
             }
         });
-
         MaryStream.print("Mary pv");
         BobStream.print("Bob pv");
         elseStream.print("else pv");
-
         env.execute();
-
     }
-
-
 }
-

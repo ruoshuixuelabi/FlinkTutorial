@@ -1,17 +1,8 @@
 package com.atguigu.chapter08;
 
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.CoGroupFunction;
-
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -24,7 +15,6 @@ public class CoGroupTest {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         DataStream<Tuple2<String, Long>> stream1 = env
                 .fromElements(
                         Tuple2.of("a", 1000L),
@@ -44,7 +34,6 @@ public class CoGroupTest {
                                         }
                                 )
                 );
-
         DataStream<Tuple2<String, Long>> stream2 = env
                 .fromElements(
                         Tuple2.of("a", 3000L),
@@ -64,7 +53,6 @@ public class CoGroupTest {
                                         }
                                 )
                 );
-
         stream1
                 .coGroup(stream2)
                 .where(r -> r.f0)
@@ -77,8 +65,6 @@ public class CoGroupTest {
                     }
                 })
                 .print();
-
         env.execute();
     }
 }
-

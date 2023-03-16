@@ -1,19 +1,8 @@
 package com.atguigu.chapter12;
-
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.cep.CEP;
-import org.apache.flink.cep.PatternSelectFunction;
 import org.apache.flink.cep.PatternStream;
-import org.apache.flink.cep.PatternTimeoutFunction;
 import org.apache.flink.cep.functions.PatternProcessFunction;
 import org.apache.flink.cep.functions.TimedOutPartialMatchHandler;
 import org.apache.flink.cep.pattern.Pattern;
@@ -27,12 +16,10 @@ import org.apache.flink.util.OutputTag;
 
 import java.util.List;
 import java.util.Map;
-
 public class OrderTimeoutDetectExample {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         // 获取订单事件流，并提取时间戳、生成水位线
         KeyedStream<OrderEvent, String> stream = env
                 .fromElements(
@@ -55,8 +42,6 @@ public class OrderTimeoutDetectExample {
                                 )
                 )
                 .keyBy(order -> order.orderId);    // 按照订单ID分组
-
-
         // 1. 定义Pattern
         Pattern<OrderEvent, ?> pattern = Pattern
                 .<OrderEvent>begin("create")    // 首先是下单事件
@@ -74,20 +59,16 @@ public class OrderTimeoutDetectExample {
                     }
                 })
                 .within(Time.minutes(15));    // 限制在15分钟之内
-
         // 2. 将Pattern应用到流上，检测匹配的复杂事件，得到一个PatternStream
         PatternStream<OrderEvent> patternStream = CEP.pattern(stream, pattern);
-
         // 3. 将匹配到的，和超时部分匹配的复杂事件提取出来，然后包装成提示信息输出
         SingleOutputStreamOperator<String> payedOrderStream = patternStream.process(new OrderPayPatternProcessFunction());
-
         // 4. 定义一个测输出流标签，用于标识超时测输出流
-        OutputTag<String> timeoutTag = new OutputTag<String>("timeout") {};
-
+        OutputTag<String> timeoutTag = new OutputTag<String>("timeout") {
+        };
         // 5. 将正常匹配和超时部分匹配的处理结果流打印输出
         payedOrderStream.print("payed");
         payedOrderStream.getSideOutput(timeoutTag).print("timeout");
-
         env.execute();
     }
 
@@ -104,8 +85,8 @@ public class OrderTimeoutDetectExample {
         @Override
         public void processTimedOutMatch(Map<String, List<OrderEvent>> match, Context ctx) throws Exception {
             OrderEvent createEvent = match.get("create").get(0);
-            ctx.output(new OutputTag<String>("timeout"){}, "订单 " + createEvent.orderId + " 超时未支付！用户为：" + createEvent.userId);
+            ctx.output(new OutputTag<String>("timeout") {
+            }, "订单 " + createEvent.orderId + " 超时未支付！用户为：" + createEvent.userId);
         }
     }
 }
-

@@ -7,7 +7,7 @@
     <artifactId>FlinkTutorial</artifactId>
     <version>1.0-SNAPSHOT</version>
     <properties>
-        <flink-version>1.16.0</flink-version>
+        <flink-version>1.16.1</flink-version>
         <flink-connector-mysql-cdc-version>2.3.0</flink-connector-mysql-cdc-version>
         <hutool-version>5.8.11</hutool-version>
         <hbase-version>2.5.3</hbase-version>

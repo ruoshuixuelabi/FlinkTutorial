@@ -1,13 +1,5 @@
 package com.atguigu.chapter12;
 
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 public class LoginEvent {
     public String userId;
     public String ipAddress;
@@ -21,7 +13,8 @@ public class LoginEvent {
         this.timestamp = timestamp;
     }
 
-    public LoginEvent() {}
+    public LoginEvent() {
+    }
 
     @Override
     public String toString() {
@@ -33,4 +26,3 @@ public class LoginEvent {
                 '}';
     }
 }
-

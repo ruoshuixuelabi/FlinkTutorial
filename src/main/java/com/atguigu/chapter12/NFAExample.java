@@ -1,13 +1,5 @@
 package com.atguigu.chapter12;
 
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
@@ -25,7 +17,6 @@ public class NFAExample {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         // 获取登录事件流，这里与时间无关，就不生成水位线了
         KeyedStream<LoginEvent, String> stream = env.fromElements(
                         new LoginEvent("user_1", "192.168.0.1", "fail", 2000L),
@@ -37,13 +28,9 @@ public class NFAExample {
                         new LoginEvent("user_2", "192.168.1.29", "fail", 8000L)
                 )
                 .keyBy(r -> r.userId);
-
         // 将数据依次输入状态机进行处理
-        DataStream<String> alertStream = stream
-                .flatMap(new StateMachineMapper());
-
+        DataStream<String> alertStream = stream.flatMap(new StateMachineMapper());
         alertStream.print("warning");
-
         env.execute();
     }
 
@@ -79,7 +66,8 @@ public class NFAExample {
             else if (nextState == State.Terminal) {
                 // 如果到了终止状态，就重置状态，准备重新开始
                 currentState.update(State.Initial);
-            } else {
+            }
+            else {
                 // 如果还没结束，更新状态（状态跳转），继续读取事件
                 currentState.update(nextState);
             }
@@ -88,20 +76,14 @@ public class NFAExample {
 
     // 状态机实现
     public enum State {
-
         Terminal,    // 匹配失败，当前匹配终止
-
         Matched,    // 匹配成功
-
         // S2状态
         S2(new Transition("fail", Matched), new Transition("success", Terminal)),
-
         // S1状态
         S1(new Transition("fail", S2), new Transition("success", Terminal)),
-
         // 初始状态
         Initial(new Transition("fail", S1), new Transition("success", Terminal));
-
         private final Transition[] transitions;    // 状态转移规则
 
         // 状态的构造方法，可以传入一组状态转移规则来定义状态
@@ -116,7 +98,6 @@ public class NFAExample {
                     return t.getTargetState();
                 }
             }
-
             // 如果没有找到转移规则，说明已经结束，回到初始状态
             return Initial;
         }
@@ -125,10 +106,8 @@ public class NFAExample {
     // 定义状态转移类，包括两个属性：当前事件类型和目标状态
     public static class Transition implements Serializable {
         private static final long serialVersionUID = 1L;
-
         // 触发状态转移的当前事件类型
         private final String eventType;
-
         // 转移的目标状态
         private final State targetState;
 
@@ -146,4 +125,3 @@ public class NFAExample {
         }
     }
 }
-

@@ -1,13 +1,5 @@
 package com.atguigu.chapter12;
 
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.cep.CEP;
@@ -26,7 +18,6 @@ public class LoginFailDetectExample {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         // 1. 获取登录事件流，并提取时间戳、生成水位线
         KeyedStream<LoginEvent, String> stream = env
                 .fromElements(
@@ -50,7 +41,6 @@ public class LoginFailDetectExample {
                                 )
                 )
                 .keyBy(r -> r.userId);
-
         // 2. 定义Pattern，连续的三个登录失败事件
         Pattern<LoginEvent, LoginEvent> pattern = Pattern.<LoginEvent>begin("first")    // 以第一个登录失败事件开始
                 .where(new SimpleCondition<LoginEvent>() {
@@ -74,9 +64,9 @@ public class LoginFailDetectExample {
                     }
                 });
 
+
         // 3. 将Pattern应用到流上，检测匹配的复杂事件，得到一个PatternStream
         PatternStream<LoginEvent> patternStream = CEP.pattern(stream, pattern);
-
         // 4. 将匹配到的复杂事件选择出来，然后包装成字符串报警信息输出
         patternStream
                 .select(new PatternSelectFunction<LoginEvent, String>() {
@@ -89,7 +79,6 @@ public class LoginFailDetectExample {
                     }
                 })
                 .print("warning");
-
         env.execute();
     }
 }

@@ -1,13 +1,5 @@
 package com.atguigu.chapter12;
 
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 public class OrderEvent {
     public String userId;
     public String orderId;
@@ -34,4 +26,3 @@ public class OrderEvent {
                 '}';
     }
 }
-

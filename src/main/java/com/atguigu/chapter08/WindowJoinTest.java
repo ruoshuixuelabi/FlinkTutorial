@@ -1,13 +1,5 @@
 package com.atguigu.chapter08;
 
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.JoinFunction;
@@ -22,7 +14,6 @@ public class WindowJoinTest {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         DataStream<Tuple2<String, Long>> stream1 = env
                 .fromElements(
                         Tuple2.of("a", 1000L),
@@ -42,7 +33,6 @@ public class WindowJoinTest {
                                         }
                                 )
                 );
-
         DataStream<Tuple2<String, Long>> stream2 = env
                 .fromElements(
                         Tuple2.of("a", 3000L),
@@ -62,7 +52,6 @@ public class WindowJoinTest {
                                         }
                                 )
                 );
-
         stream1
                 .join(stream2)
                 .where(r -> r.f0)
@@ -75,7 +64,6 @@ public class WindowJoinTest {
                     }
                 })
                 .print();
-
         env.execute();
     }
 }

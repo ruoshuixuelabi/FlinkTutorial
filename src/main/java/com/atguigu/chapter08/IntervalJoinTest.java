@@ -1,13 +1,5 @@
 package com.atguigu.chapter08;
 
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import com.atguigu.chapter05.Event;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -20,11 +12,9 @@ import org.apache.flink.util.Collector;
 
 // 基于间隔的join
 public class IntervalJoinTest {
-
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         SingleOutputStreamOperator<Tuple3<String, String, Long>> orderStream = env.fromElements(
                 Tuple3.of("Mary", "order-1", 5000L),
                 Tuple3.of("Alice", "order-2", 5000L),
@@ -39,7 +29,6 @@ public class IntervalJoinTest {
                     }
                 })
         );
-
         SingleOutputStreamOperator<Event> clickStream = env.fromElements(
                 new Event("Bob", "./cart", 2000L),
                 new Event("Alice", "./prod?id=100", 3000L),
@@ -57,7 +46,6 @@ public class IntervalJoinTest {
                     }
                 })
         );
-
         orderStream.keyBy(data -> data.f0)
                 .intervalJoin(clickStream.keyBy(data -> data.user))
                 .between(Time.seconds(-5), Time.seconds(10))
@@ -68,7 +56,6 @@ public class IntervalJoinTest {
                     }
                 })
                 .print();
-
         env.execute();
-    }}
-
+    }
+}

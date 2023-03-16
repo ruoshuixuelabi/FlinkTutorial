@@ -1,13 +1,4 @@
 package com.atguigu.chapter07;
-
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import com.atguigu.chapter05.ClickSource;
 import com.atguigu.chapter05.Event;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
@@ -21,17 +12,14 @@ import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindow
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-
 public class ProcessAllWindowTopN {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         SingleOutputStreamOperator<Event> eventStream = env.addSource(new ClickSource())
                 .assignTimestampsAndWatermarks(
                         WatermarkStrategy.<Event>forMonotonousTimestamps()
@@ -42,7 +30,6 @@ public class ProcessAllWindowTopN {
                                     }
                                 })
                 );
-
         // 只需要url就可以统计数量，所以转换成String直接开窗统计
         SingleOutputStreamOperator<String> result = eventStream
                 .map(new MapFunction<Event, String>() {
@@ -85,17 +72,13 @@ public class ProcessAllWindowTopN {
                                     " url：" + temp.f0 +
                                     " 浏览量：" + temp.f1 +
                                     " 窗口结束时间：" + new Timestamp(context.window().getEnd()) + "\n";
-
                             result.append(info);
                         }
                         result.append("========================================\n");
                         out.collect(result.toString());
                     }
                 });
-
         result.print();
-
         env.execute();
     }
 }
-

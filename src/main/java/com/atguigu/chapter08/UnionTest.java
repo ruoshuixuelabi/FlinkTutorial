@@ -1,13 +1,5 @@
 package com.atguigu.chapter08;
 
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import com.atguigu.chapter05.Event;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -22,9 +14,6 @@ public class UnionTest {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
-
-
         SingleOutputStreamOperator<Event> stream1 = env.socketTextStream("hadoop102", 7777)
                 .map(data -> {
                     String[] field = data.split(",");
@@ -39,7 +28,6 @@ public class UnionTest {
                         })
                 );
         stream1.print("stream1");
-
         SingleOutputStreamOperator<Event> stream2 = env.socketTextStream("hadoop103", 7777)
                 .map(data -> {
                     String[] field = data.split(",");
@@ -53,9 +41,7 @@ public class UnionTest {
                             }
                         })
                 );
-
         stream2.print("stream2");
-
         // 合并两条流
         stream1.union(stream2)
                 .process(new ProcessFunction<Event, String>() {
@@ -65,9 +51,6 @@ public class UnionTest {
                     }
                 })
                 .print();
-
-
         env.execute();
     }
 }
-

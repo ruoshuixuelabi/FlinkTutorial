@@ -1,13 +1,4 @@
 package com.atguigu.chapter06;
-
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import com.atguigu.chapter05.Event;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -18,18 +9,13 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindo
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
-
 import java.time.Duration;
-
-
-
 public class WatermarkTest {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         // 将数据源改为socket文本流，并转换成Event类型
-        env.socketTextStream("localhost", 7777)
+        env.socketTextStream("172.18.30.88", 7777)
                 .map(new MapFunction<String, Event>() {
                     @Override
                     public Event map(String value) throws Exception {
@@ -54,10 +40,8 @@ public class WatermarkTest {
                 .window(TumblingEventTimeWindows.of(Time.seconds(10)))
                 .process(new WatermarkTestResult())
                 .print();
-
         env.execute();
     }
-
     // 自定义处理窗口函数，输出当前的水位线和窗口信息
     public static class WatermarkTestResult extends ProcessWindowFunction<Event, String, String, TimeWindow>{
         @Override
@@ -70,6 +54,3 @@ public class WatermarkTest {
         }
     }
 }
-
-
-

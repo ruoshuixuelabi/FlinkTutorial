@@ -1,17 +1,8 @@
 package com.atguigu.chapter12;
 
-/**
- * Copyright (c) 2020-2030 尚硅谷 All Rights Reserved
- * <p>
- * Project:  FlinkTutorial
- * <p>
- * Created by  wushengran
- */
-
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.cep.CEP;
-import org.apache.flink.cep.PatternSelectFunction;
 import org.apache.flink.cep.PatternStream;
 import org.apache.flink.cep.functions.PatternProcessFunction;
 import org.apache.flink.cep.pattern.Pattern;
@@ -29,7 +20,6 @@ public class LoginFailDetectProExample {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
         // 1. 获取登录事件流，并提取时间戳、生成水位线
         KeyedStream<LoginEvent, String> stream = env
                 .fromElements(
@@ -62,11 +52,10 @@ public class LoginFailDetectProExample {
                         return loginEvent.eventType.equals("fail");
                     }
                 }).times(3).consecutive();    // 指定是严格紧邻的三次登录失败
-
         // 3. 将Pattern应用到流上，检测匹配的复杂事件，得到一个PatternStream
         PatternStream<LoginEvent> patternStream = CEP.pattern(stream, pattern);
-
         // 4. 将匹配到的复杂事件选择出来，然后包装成字符串报警信息输出
+
         SingleOutputStreamOperator<String> warningStream = patternStream
                 .process(new PatternProcessFunction<LoginEvent, String>() {
                     @Override
@@ -75,18 +64,14 @@ public class LoginFailDetectProExample {
                         LoginEvent firstFailEvent = match.get("fail").get(0);
                         LoginEvent secondFailEvent = match.get("fail").get(1);
                         LoginEvent thirdFailEvent = match.get("fail").get(2);
-
                         out.collect(firstFailEvent.userId + " 连续三次登录失败！登录时间：" +
                                 firstFailEvent.timestamp + ", " +
                                 secondFailEvent.timestamp + ", " +
                                 thirdFailEvent.timestamp);
                     }
                 });
-
         // 打印输出
         warningStream.print("warning");
-
         env.execute();
     }
 }
-
