@@ -18,7 +18,9 @@ public class NFAExample {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         // 获取登录事件流，这里与时间无关，就不生成水位线了
-        KeyedStream<LoginEvent, String> stream = env.fromElements(
+        KeyedStream<LoginEvent, String> stream = env
+//                .fromElements( //新版本修改为fromData
+                .fromData(
                         new LoginEvent("user_1", "192.168.0.1", "fail", 2000L),
                         new LoginEvent("user_1", "192.168.0.2", "fail", 3000L),
                         new LoginEvent("user_2", "192.168.1.29", "fail", 4000L),
@@ -36,7 +38,6 @@ public class NFAExample {
 
     @SuppressWarnings("serial")
     public static class StateMachineMapper extends RichFlatMapFunction<LoginEvent, String> {
-
         // 声明当前用户对应的状态
         private ValueState<State> currentState;
 
@@ -53,11 +54,8 @@ public class NFAExample {
             if (state == null) {
                 state = State.Initial;
             }
-
             // 基于当前状态，输入当前事件时跳转到下一状态
             State nextState = state.transition(event.eventType);
-
-
             if (nextState == State.Matched) {
                 // 如果检测到匹配的复杂事件，输出报警信息
                 out.collect(event.userId + " 连续三次登录失败");

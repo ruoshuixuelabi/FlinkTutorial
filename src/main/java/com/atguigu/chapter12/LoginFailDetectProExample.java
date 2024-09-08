@@ -22,7 +22,8 @@ public class LoginFailDetectProExample {
         env.setParallelism(1);
         // 1. 获取登录事件流，并提取时间戳、生成水位线
         KeyedStream<LoginEvent, String> stream = env
-                .fromElements(
+//                .fromElements( //新版本修改为fromData
+                .fromData(
                         new LoginEvent("user_1", "192.168.0.1", "fail", 2000L),
                         new LoginEvent("user_1", "192.168.0.2", "fail", 3000L),
                         new LoginEvent("user_2", "192.168.1.29", "fail", 4000L),
@@ -34,16 +35,10 @@ public class LoginFailDetectProExample {
                 .assignTimestampsAndWatermarks(
                         WatermarkStrategy.<LoginEvent>forBoundedOutOfOrderness(Duration.ofSeconds(3))
                                 .withTimestampAssigner(
-                                        new SerializableTimestampAssigner<LoginEvent>() {
-                                            @Override
-                                            public long extractTimestamp(LoginEvent loginEvent, long l) {
-                                                return loginEvent.timestamp;
-                                            }
-                                        }
+                                        (SerializableTimestampAssigner<LoginEvent>) (loginEvent, l) -> loginEvent.timestamp
                                 )
                 )
                 .keyBy(r -> r.userId);
-
         // 2. 定义Pattern，连续的三个登录失败事件
         Pattern<LoginEvent, LoginEvent> pattern = Pattern.<LoginEvent>begin("fail")    // 第一个登录失败事件
                 .where(new SimpleCondition<LoginEvent>() {
@@ -55,7 +50,6 @@ public class LoginFailDetectProExample {
         // 3. 将Pattern应用到流上，检测匹配的复杂事件，得到一个PatternStream
         PatternStream<LoginEvent> patternStream = CEP.pattern(stream, pattern);
         // 4. 将匹配到的复杂事件选择出来，然后包装成字符串报警信息输出
-
         SingleOutputStreamOperator<String> warningStream = patternStream
                 .process(new PatternProcessFunction<LoginEvent, String>() {
                     @Override

@@ -1,4 +1,5 @@
 package com.atguigu.chapter12;
+
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.cep.CEP;
@@ -14,15 +15,18 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+
 public class OrderTimeoutDetectExample {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         // 获取订单事件流，并提取时间戳、生成水位线
         KeyedStream<OrderEvent, String> stream = env
-                .fromElements(
+//                .fromElements( //新版本修改为fromData
+                .fromData(
                         new OrderEvent("user_1", "order_1", "create", 1000L),
                         new OrderEvent("user_2", "order_2", "create", 2000L),
                         new OrderEvent("user_1", "order_1", "modify", 10 * 1000L),
@@ -33,12 +37,7 @@ public class OrderTimeoutDetectExample {
                 .assignTimestampsAndWatermarks(
                         WatermarkStrategy.<OrderEvent>forMonotonousTimestamps()
                                 .withTimestampAssigner(
-                                        new SerializableTimestampAssigner<OrderEvent>() {
-                                            @Override
-                                            public long extractTimestamp(OrderEvent event, long l) {
-                                                return event.timestamp;
-                                            }
-                                        }
+                                        (SerializableTimestampAssigner<OrderEvent>) (event, l) -> event.timestamp
                                 )
                 )
                 .keyBy(order -> order.orderId);    // 按照订单ID分组
@@ -58,7 +57,8 @@ public class OrderTimeoutDetectExample {
                         return value.eventType.equals("pay");
                     }
                 })
-                .within(Time.minutes(15));    // 限制在15分钟之内
+                .within(Duration.ofMinutes(15));    // 限制在15分钟之内  新版本使用这个
+//                .within(Time.minutes(15));    // 限制在15分钟之内 老版本是这样写的
         // 2. 将Pattern应用到流上，检测匹配的复杂事件，得到一个PatternStream
         PatternStream<OrderEvent> patternStream = CEP.pattern(stream, pattern);
         // 3. 将匹配到的，和超时部分匹配的复杂事件提取出来，然后包装成提示信息输出
